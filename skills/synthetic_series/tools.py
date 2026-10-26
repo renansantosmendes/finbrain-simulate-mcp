@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from typing import Annotated
 
 import numpy as np
 from arch import arch_model
@@ -59,32 +60,67 @@ def _fit_garch_params(historical_returns: list[float]) -> tuple[float, float, fl
 
 @tool
 def generate_synthetic_stock_series_garch_arch(
-    ticker: str,
-    start_date: str,
-    n_days: int,
-    value_type: str = "close",
-    n_series: int = 1,
-    mode: str = "simulate",
-    initial_price: float = 100.0,
-    mu: float = 0.0,
-    omega: float = 0.02,
-    alpha: float = 0.10,
-    beta: float = 0.85,
-    historical_returns: list[float] | None = None,
-    seed: int | None = None,
+    ticker: Annotated[str, "Stock ticker, for example PETR4 or AAPL. Used in messages only; no market data is fetched."],
+    start_date: Annotated[str, "First calendar date of the series, in YYYY-MM-DD format. Weekends are skipped."],
+    n_days: Annotated[int, "Number of business days to simulate. Must be at least 1."],
+    value_type: Annotated[str, "OHLC field to return for each series: 'open', 'high', 'low' or 'close'."] = "close",
+    n_series: Annotated[int, "How many independent price paths to generate. Must be at least 1."] = 1,
+    mode: Annotated[str, "'simulate' uses the GARCH parameters below; 'fit_and_simulate' estimates them from historical_returns first."] = "simulate",
+    initial_price: Annotated[float, "Price of the asset on the day before the first simulated day."] = 100.0,
+    mu: Annotated[float, "Constant mean of the daily return, in percent (0.1 means 0.1% per day). Used in 'simulate' mode."] = 0.0,
+    omega: Annotated[float, "GARCH constant term for the conditional variance, in percent squared. Used in 'simulate' mode."] = 0.02,
+    alpha: Annotated[float, "GARCH ARCH coefficient: how strongly yesterday's shock moves today's volatility. Must satisfy alpha + beta < 1."] = 0.10,
+    beta: Annotated[float, "GARCH GARCH coefficient: how persistent yesterday's volatility is. Must satisfy alpha + beta < 1."] = 0.85,
+    historical_returns: Annotated[list[float] | None, "Past daily fractional returns (0.01 means 1%), at least 30 values. Required in 'fit_and_simulate' mode."] = None,
+    seed: Annotated[int | None, "Seed of the random generator, for reproducible series. Omit for a different result on each call."] = None,
 ) -> str:
-    """
-    Generate N synthetic price time series for a stock using a GARCH(1,1) model
-    (`arch` package). Useful to simulate plausible future price paths or to
-    stress-test strategies against synthetic scenarios.
+    """Generate synthetic daily price series with a GARCH(1,1) model.
 
-    value_type selects which OHLC field is returned ('open', 'high', 'low', 'close').
-    mode='simulate' uses the manually informed mu/omega/alpha/beta parameters.
-    mode='fit_and_simulate' estimates GARCH(1,1) parameters via MLE from
-    'historical_returns' (daily fractional returns, at least 30 observations)
-    and simulates using the fitted parameters.
+    Each series is a path of business days (weekends skipped) with open, high,
+    low and close prices derived from simulated daily returns. Use it to
+    illustrate plausible future price paths or to stress-test strategies
+    against synthetic scenarios.
 
-    Returns a JSON string shaped as {"serie_1": [values...], ..., "serie_n": [values...]}.
+    The result is a statistical simulation, not a forecast. It does not
+    constitute investment advice.
+
+    Parameters
+    ----------
+    ticker : str
+        Stock ticker, used in error messages only.
+    start_date : str
+        First calendar date, in YYYY-MM-DD format.
+    n_days : int
+        Number of business days to simulate.
+    value_type : str
+        Which OHLC field to return: 'open', 'high', 'low' or 'close'.
+    n_series : int
+        Number of independent price paths.
+    mode : str
+        'simulate' or 'fit_and_simulate'.
+    initial_price : float
+        Starting price, before the first simulated day.
+    mu, omega, alpha, beta : float
+        GARCH(1,1) parameters used in 'simulate' mode. alpha + beta must be
+        below 1 for the process to be stationary.
+    historical_returns : list[float] or None
+        Daily fractional returns used to estimate the parameters in
+        'fit_and_simulate' mode (at least 30 values).
+    seed : int or None
+        Seed for reproducible output.
+
+    Returns
+    -------
+    str
+        JSON object with one array per series, named ``serie_1`` to
+        ``serie_n``. On invalid input, a JSON object with an ``error`` key.
+
+    Example
+    -------
+    >>> generate_synthetic_stock_series_garch_arch.invoke(  # doctest: +SKIP
+    ...     {"ticker": "PETR4", "start_date": "2026-01-01", "n_days": 5, "seed": 7}
+    ... )
+    '{"serie_1": [...]}'
     """
     if value_type not in ("open", "high", "low", "close"):
         return json.dumps({"error": "value_type must be 'open', 'high', 'low' or 'close'."})

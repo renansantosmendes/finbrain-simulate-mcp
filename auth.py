@@ -23,7 +23,13 @@ JWKS_CACHE_SECONDS = 3600
 JWKS_TIMEOUT_SECONDS = 10
 DEFAULT_ISSUER = "auth-service"
 DEFAULT_AUDIENCE = "synapse-apps"
-PUBLIC_PATHS = ("/health",)
+PUBLIC_PATHS = (
+    "/health",
+    "/docs",
+    "/docs/oauth2-redirect",
+    "/openapi.json",
+    "/redoc",
+)
 INVALID_TOKEN_MESSAGE = "Invalid or expired access token."
 UNAVAILABLE_MESSAGE = "Authentication service unavailable."
 

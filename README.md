@@ -23,10 +23,18 @@ pelas chaves públicas do JWKS, com `iss`, `aud`, `typ=access` e expiração.
 
 - Sem token ou com token inválido: `401` com `{"code", "message"}`.
 - auth_service inacessível: `503`.
-- `/health` não exige token.
+- `/health`, `/docs`, `/openapi.json` e `/redoc` não exigem token. `/tools` e `/mcp` exigem.
 - Sem `FINBRAIN_AUTH_JWKS_URL`, o endpoint fica aberto.
 
 Ver [`auth.py`](auth.py).
+
+## Documentação (Swagger)
+
+Abra `/docs` (Swagger UI) para ver, em inglês, a descrição do servidor, cada
+parâmetro da ferramenta com seus limites, a operação `/mcp` com exemplos
+JSON-RPC (`initialize`, `tools/list`, `tools/call`) e o catálogo JSON em `/tools`.
+Use o botão **Authorize** para informar o Bearer token quando a autenticação estiver ligada.
+O código fica em [`docs_api.py`](docs_api.py).
 
 ## Variáveis de ambiente
 
