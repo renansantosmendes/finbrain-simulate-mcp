@@ -1,5 +1,7 @@
 # FinBrain Simulate MCP
 
+![Python](https://img.shields.io/badge/Python-3-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-0.139.2-009688?logo=fastapi&logoColor=white) ![uvicorn](https://img.shields.io/badge/uvicorn-0.51.0-499848) ![Langfuse](https://img.shields.io/badge/Langfuse-4.14.1-000000) ![pytest](https://img.shields.io/badge/pytest-8.4.1-0A9EDC?logo=pytest&logoColor=white) ![pandas](https://img.shields.io/badge/pandas-2.3.1-150458?logo=pandas&logoColor=white) ![Vercel](https://img.shields.io/badge/Vercel-deploy-000000?logo=vercel&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-2088FF?logo=githubactions&logoColor=white)
+
 An **MCP (Model Context Protocol)** server that exposes the FinBrain tool for
 simulating synthetic stock price series with a GARCH(1,1) model, using the
 `arch` library.

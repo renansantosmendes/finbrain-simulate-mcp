@@ -184,3 +184,19 @@ server, a subagent or a skill for this project.
 - If the agent calls a model, record the model identifier and the main
   hyperparameters in its configuration, and track experiments following
   the "About experiment tracking" section when training is involved.
+
+## About documentation
+
+- Every README must start with Shields.io badges
+  (`https://img.shields.io`) for the main technologies used by the project:
+  language, frameworks, libraries, cloud services and CI. Use the static
+  badge format
+  `https://img.shields.io/badge/<Label>-<Message>-<color>?logo=<logo>&logoColor=white`,
+  and include the version when the project pins it.
+- Every README must include at least one Mermaid diagram (a fenced
+  `mermaid` block) showing the architecture or the main flow of the
+  project, so GitHub renders it in the page.
+- Larger diagrams can live under `docs/` as Excalidraw files
+  (`.excalidraw`) and be linked from the README.
+- When a change affects the architecture, routes, configuration, tech stack
+  or CI, update the badges and diagrams in the same change.
